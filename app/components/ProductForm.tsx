@@ -98,6 +98,13 @@ export function ProductForm({
         </div>
         <QuantitySelector state={[quantity, setQuantity]} />
       </div>
+      {isCustomizedProduct && (
+        <div>
+          Expected production time for custom labels is{' '}
+          <strong>10 working days</strong> from the time of placing your order
+          to delivery.
+        </div>
+      )}
     </div>
   );
 }
