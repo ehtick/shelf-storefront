@@ -1,10 +1,8 @@
 /// <reference types="vite/client" />
-/// <reference types="@shopify/remix-oxygen" />
 /// <reference types="@shopify/oxygen-workers-types" />
 
 // Enhance TypeScript's built-in typings.
 import '@total-typescript/ts-reset';
-import type {createAppLoadContext} from '~/lib/context';
 
 import type {
   Storefront,
@@ -53,24 +51,4 @@ declare global {
     country: CountryCode;
     pathPrefix: string;
   };
-}
-
-declare module '@shopify/remix-oxygen' {
-  /**
-   * Declare local additions to the Remix loader context.
-   */
-  interface AppLoadContext
-    extends Awaited<ReturnType<typeof createAppLoadContext>> {
-    env: Env;
-    cart: HydrogenCart;
-    storefront: Storefront<I18nLocale>;
-    customerAccount: CustomerAccount;
-    session: AppSession;
-    waitUntil: ExecutionContext['waitUntil'];
-  }
-
-  /**
-   * Declare local additions to the Remix session data.
-   */
-  interface SessionData extends HydrogenSessionData {}
 }

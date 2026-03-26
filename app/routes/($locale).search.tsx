@@ -1,5 +1,5 @@
-import {defer, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
-import {useLoaderData, type MetaFunction} from '@remix-run/react';
+import {type LoaderFunctionArgs} from 'react-router';
+import {useLoaderData, type MetaFunction} from 'react-router';
 import {getPaginationVariables, Analytics} from '@shopify/hydrogen';
 
 import {SearchForm, SearchResults, NoSearchResults} from '~/components/Search';
@@ -42,10 +42,10 @@ export async function loader({request, context}: LoaderFunctionArgs) {
     totalResults,
   };
 
-  return defer({
+  return {
     searchTerm,
     searchResults,
-  });
+  };
 }
 
 export default function SearchPage() {

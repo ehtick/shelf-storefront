@@ -1,6 +1,6 @@
 import {Image, Money} from '@shopify/hydrogen';
 import type {FeaturedCollectionFragment} from 'storefrontapi.generated';
-import {Link} from '@remix-run/react';
+import {Link} from 'react-router';
 
 export const ProductCard = ({
   product,

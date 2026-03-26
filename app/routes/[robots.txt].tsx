@@ -1,5 +1,5 @@
-import {type LoaderFunctionArgs} from '@shopify/remix-oxygen';
-import {useRouteError, isRouteErrorResponse} from '@remix-run/react';
+import {type LoaderFunctionArgs} from 'react-router';
+import {useRouteError, isRouteErrorResponse} from 'react-router';
 import {parseGid} from '@shopify/hydrogen';
 
 export async function loader({request, context}: LoaderFunctionArgs) {

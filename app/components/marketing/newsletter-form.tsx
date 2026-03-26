@@ -1,4 +1,4 @@
-import {useRouteLoaderData} from '@remix-run/react';
+import {useRouteLoaderData} from 'react-router';
 import {Script, useNonce} from '@shopify/hydrogen';
 import {useEffect} from 'react';
 import {ClientOnly} from 'remix-utils/client-only';

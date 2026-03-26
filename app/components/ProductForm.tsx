@@ -1,4 +1,4 @@
-import {useNavigate} from '@remix-run/react';
+import {useNavigate} from 'react-router';
 import {type MappedProductOptions} from '@shopify/hydrogen';
 import type {ProductFragment} from 'storefrontapi.generated';
 import {twMerge} from 'tailwind-merge';

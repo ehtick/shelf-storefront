@@ -1,4 +1,4 @@
-import {json, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
+import {type LoaderFunctionArgs} from 'react-router';
 import type {
   NormalizedPredictiveSearch,
   NormalizedPredictiveSearchResults,
@@ -43,7 +43,7 @@ export async function loader({request, params, context}: LoaderFunctionArgs) {
     context,
   });
 
-  return json(search, {
+  return Response.json(search, {
     headers: {'Cache-Control': `max-age=${search.searchTerm ? 60 : 3600}`},
   });
 }

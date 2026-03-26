@@ -1,62 +1,29 @@
-import {
-  json,
-  unstable_composeUploadHandlers,
-  unstable_parseMultipartFormData,
-} from '@remix-run/server-runtime';
 import {getSupabaseAdmin} from './supabase.server';
-
-// Define interfaces for better type safety
-interface ResizeOptions {
-  width?: number;
-  height?: number;
-  fit?: string;
-  // Add other resize options as needed
-}
 
 export interface ConnectionData {
   serviceRole: string;
   supabaseUrl: string;
 }
 
-interface UploadOptions {
-  filename: string;
-  contentType: string;
-  resizeOptions?: ResizeOptions;
-}
-
-interface FileFormDataParams {
-  request: Request;
-  newFileName: string;
-  resizeOptions?: ResizeOptions;
-  connectionData: ConnectionData;
-}
+const ALLOWED_CONTENT_TYPES = [
+  'image/png',
+  'image/svg+xml',
+  'application/pdf',
+];
 
 // Get current date formatted as YYYY-MM-DD
 function getCurrentDateFolder(): string {
   const now = new Date();
-  return now.toISOString().split('T')[0]; // Returns YYYY-MM-DD format
+  return now.toISOString().split('T')[0];
 }
 
-async function uploadFile(
-  fileData: AsyncIterable<Uint8Array>,
-  {filename, contentType}: UploadOptions,
+async function uploadFileToSupabase(
+  fileData: Uint8Array,
+  filename: string,
+  contentType: string,
   connectionData: ConnectionData,
 ) {
   try {
-    const chunks: Uint8Array[] = [];
-    for await (const chunk of fileData) chunks.push(chunk);
-
-    // Calculate total length
-    const totalLength = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
-
-    // Create a single Uint8Array
-    const file = new Uint8Array(totalLength);
-    let offset = 0;
-    for (const chunk of chunks) {
-      file.set(chunk, offset);
-      offset += chunk.length;
-    }
-
     const supabase = getSupabaseAdmin(
       connectionData.serviceRole,
       connectionData.supabaseUrl,
@@ -64,7 +31,7 @@ async function uploadFile(
 
     const {data, error} = await supabase.storage
       .from('store-files')
-      .upload(filename, file, {contentType, upsert: true});
+      .upload(filename, fileData, {contentType, upsert: true});
 
     if (error) {
       console.error('Supabase upload error:', JSON.stringify(error));
@@ -77,58 +44,12 @@ async function uploadFile(
     });
   } catch (cause) {
     console.error('Full upload error:', cause);
-    // Rethrow with more specific info if possible
     if (cause instanceof Error) {
       throw new Error(`File upload failed: ${cause.message}`, {cause});
     }
     throw new Error(
       'Something went wrong while uploading the file. Please try again or contact support.',
       {cause},
-    );
-  }
-}
-
-export async function parseFileFormData({
-  request,
-  newFileName,
-  connectionData,
-}: FileFormDataParams): Promise<FormData> {
-  try {
-    const uploadHandler = unstable_composeUploadHandlers(
-      async ({contentType, data, filename}) => {
-        const allowedContentTypes = [
-          'image/png',
-          'image/svg+xml',
-          'application/pdf',
-        ];
-
-        if (!contentType || !allowedContentTypes.includes(contentType) || !filename) {
-          return undefined;
-        }
-
-        const fileExtension = filename.split('.').pop();
-        const uploadedFilePath = await uploadFile(
-          data,
-          {
-            filename: `${getCurrentDateFolder()}/${newFileName}.${fileExtension}`,
-            contentType,
-          },
-          connectionData,
-        );
-
-        return uploadedFilePath;
-      },
-    );
-
-    const formData = await unstable_parseMultipartFormData(
-      request,
-      uploadHandler,
-    );
-    return formData;
-  } catch (cause) {
-    console.error('Error parsing form data:', cause);
-    throw new Error(
-      'Something went wrong while uploading the file. Please try again or contact support.',
     );
   }
 }
@@ -185,7 +106,7 @@ export const extractImageNameFromSupabaseUrl = (url: string) => {
     `\\/store-files\\/([a-f0-9-]+)\\/([a-z0-9]+)\\/([a-z0-9\\-]+\\.[a-z]{3,4})`,
     'i',
   );
-  const match = url.split('?')[0].match(regex); // split the url at '?' and take the first part
+  const match = url.split('?')[0].match(regex);
   if (match) {
     const path = `${match[1]}/${match[2]}/${match[3]}`;
     return path;
@@ -196,24 +117,50 @@ export async function handleFileUpload(
   request: Request,
   connectionData: ConnectionData,
 ) {
-  const fileFormData = await parseFileFormData({
-    request,
-    newFileName: `customer-logo-${Date.now()}`,
-    connectionData,
-  });
-  const file = fileFormData.get('file');
+  try {
+    const formData = await request.formData();
+    const file = formData.get('file');
 
-  if (!file) {
-    return json(
-      {error: 'File not found'},
-      {status: 400, headers: new Headers()},
+    if (!file || !(file instanceof File)) {
+      return Response.json(
+        {error: 'File not found'},
+        {status: 400},
+      );
+    }
+
+    const contentType = file.type;
+    if (!ALLOWED_CONTENT_TYPES.includes(contentType)) {
+      return Response.json(
+        {error: 'File type not supported'},
+        {status: 400},
+      );
+    }
+
+    const fileExtension = file.name.split('.').pop();
+    const newFileName = `customer-logo-${Date.now()}`;
+    const filename = `${getCurrentDateFolder()}/${newFileName}.${fileExtension}`;
+
+    const arrayBuffer = await file.arrayBuffer();
+    const fileData = new Uint8Array(arrayBuffer);
+
+    const publicUrl = await uploadFileToSupabase(
+      fileData,
+      filename,
+      contentType,
+      connectionData,
+    );
+
+    return Response.json(
+      {success: true, fileName: publicUrl},
+      {status: 200},
+    );
+  } catch (cause) {
+    console.error('Error uploading file:', cause);
+    return Response.json(
+      {error: 'Something went wrong while uploading the file. Please try again or contact support.'},
+      {status: 500},
     );
   }
-
-  return json(
-    {success: true, fileName: file},
-    {status: 200, headers: new Headers()},
-  );
 }
 
 export async function handleFileDelete(
@@ -221,8 +168,8 @@ export async function handleFileDelete(
   connectionData: ConnectionData,
 ) {
   await deleteImage({url, connectionData});
-  return json(
+  return Response.json(
     {success: true, message: 'File deleted successfully'},
-    {status: 200, headers: new Headers()},
+    {status: 200},
   );
 }

@@ -1,5 +1,5 @@
-import {defer, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
-import {Form, useLoaderData, type MetaFunction} from '@remix-run/react';
+import {type LoaderFunctionArgs} from 'react-router';
+import {Form, useLoaderData, type MetaFunction} from 'react-router';
 import {appendToMetaTitle} from '~/utils/append-to-meta-title';
 import {Button} from '~/components/button';
 import {z} from 'zod';
@@ -17,7 +17,7 @@ export async function loader(args: LoaderFunctionArgs) {
   // Await the critical data required to render initial state of the page
   const criticalData = await loadCriticalData(args);
 
-  return defer({...deferredData, ...criticalData});
+  return {...deferredData, ...criticalData};
 }
 
 /**

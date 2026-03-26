@@ -1,8 +1,8 @@
-import {Await, type MetaFunction, useRouteLoaderData} from '@remix-run/react';
+import {Await, type MetaFunction, useRouteLoaderData} from 'react-router';
 import {Suspense} from 'react';
 import type {CartQueryDataReturn} from '@shopify/hydrogen';
 import {CartForm} from '@shopify/hydrogen';
-import {json, type ActionFunctionArgs} from '@shopify/remix-oxygen';
+import {type ActionFunctionArgs} from 'react-router';
 import {CartMain} from '~/components/CartMain';
 import type {RootLoader} from '~/root';
 import {appendToMetaTitle} from '~/utils/append-to-meta-title';
@@ -83,7 +83,7 @@ export async function action({request, context}: ActionFunctionArgs) {
     headers.set('Location', redirectTo);
   }
 
-  return json(
+  return Response.json(
     {
       cart: cartResult,
       errors,

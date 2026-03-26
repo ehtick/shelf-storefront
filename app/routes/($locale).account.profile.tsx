@@ -2,17 +2,16 @@ import type {CustomerFragment} from 'customer-accountapi.generated';
 import type {CustomerUpdateInput} from '@shopify/hydrogen/customer-account-api-types';
 import {CUSTOMER_UPDATE_MUTATION} from '~/graphql/customer-account/CustomerUpdateMutation';
 import {
-  json,
   type ActionFunctionArgs,
   type LoaderFunctionArgs,
-} from '@shopify/remix-oxygen';
+} from 'react-router';
 import {
   Form,
   useActionData,
   useNavigation,
   useOutletContext,
   type MetaFunction,
-} from '@remix-run/react';
+} from 'react-router';
 import Input from '~/components/form/input';
 import {Button} from '~/components/button';
 
@@ -28,14 +27,14 @@ export const meta: MetaFunction = () => {
 export async function loader({context}: LoaderFunctionArgs) {
   await context.customerAccount.handleAuthStatus();
 
-  return json({});
+  return {};
 }
 
 export async function action({request, context}: ActionFunctionArgs) {
   const {customerAccount} = context;
 
   if (request.method !== 'PUT') {
-    return json({error: 'Method not allowed'}, {status: 405});
+    return Response.json({error: 'Method not allowed'}, {status: 405});
   }
 
   const form = await request.formData();
@@ -70,12 +69,12 @@ export async function action({request, context}: ActionFunctionArgs) {
       throw new Error('Customer profile update failed.');
     }
 
-    return json({
+    return {
       error: null,
       customer: data?.customerUpdate?.customer,
-    });
+    };
   } catch (error: any) {
-    return json(
+    return Response.json(
       {error: error.message, customer: null},
       {
         status: 400,

@@ -1,5 +1,5 @@
-import {json, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
-import {Form, NavLink, Outlet, useLoaderData} from '@remix-run/react';
+import {type LoaderFunctionArgs, data as dataResponse} from 'react-router';
+import {Form, NavLink, Outlet, useLoaderData} from 'react-router';
 import {CUSTOMER_DETAILS_QUERY} from '~/graphql/customer-account/CustomerDetailsQuery';
 import HorizontalTabs from '~/components/layout/horizontal-tabs';
 import {Button} from '~/components/button';
@@ -17,7 +17,7 @@ export async function loader({context}: LoaderFunctionArgs) {
     throw new Error('Customer not found');
   }
 
-  return json(
+  return dataResponse(
     {customer: data.customer},
     {
       headers: {
