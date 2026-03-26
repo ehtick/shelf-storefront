@@ -148,10 +148,10 @@ export function normalizePredictiveSearchResults(
             __typename: product.__typename,
             handle: product.handle,
             id: product.id,
-            image: product.variants?.nodes?.[0]?.image,
+            image: product.selectedOrFirstAvailableVariant?.image,
             title: product.title,
             url: `${localePrefix}/products/${product.handle}${trackingParams}`,
-            price: product.variants.nodes[0].price,
+            price: product.selectedOrFirstAvailableVariant?.price,
           };
         },
       ),
@@ -262,19 +262,21 @@ const PREDICTIVE_SEARCH_QUERY = `#graphql
     title
     handle
     trackingParameters
-    variants(first: 1) {
-      nodes {
-        id
-        image {
-          url
-          altText
-          width
-          height
-        }
-        price {
-          amount
-          currencyCode
-        }
+    selectedOrFirstAvailableVariant(
+      selectedOptions: []
+      ignoreUnknownOptions: true
+      caseInsensitiveMatch: true
+    ) {
+      id
+      image {
+        url
+        altText
+        width
+        height
+      }
+      price {
+        amount
+        currencyCode
       }
     }
   }

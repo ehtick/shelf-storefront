@@ -10,9 +10,11 @@ export async function action({context, request}: ActionFunctionArgs) {
     serviceRole: env.SUPABASE_SERVICE_ROLE,
     supabaseUrl: env.SUPABASE_URL,
   };
-  const formData = await request.clone().formData();
-  const intent = formData.get('intent');
-  const fileUrl = formData.get('url'); // URL to delete
+
+  // Clone for peeking at intent/url, keep original for upload (which needs the raw stream)
+  const peekFormData = await request.clone().formData();
+  const intent = peekFormData.get('intent');
+  const fileUrl = peekFormData.get('url'); // URL to delete
 
   switch (intent) {
     case 'upload':

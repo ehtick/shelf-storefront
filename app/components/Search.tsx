@@ -16,15 +16,15 @@ import type {
   SearchQuery,
 } from 'storefrontapi.generated';
 
-import type {PredictiveSearchAPILoader} from '../routes/api.predictive-search';
+import type {PredictiveSearchAPILoader} from '../routes/($locale).api.predictive-search';
 
 type PredicticeSearchResultItemImage =
   | PredictiveCollectionFragment['image']
   | PredictiveArticleFragment['image']
-  | PredictiveProductFragment['variants']['nodes'][0]['image'];
+  | NonNullable<PredictiveProductFragment['selectedOrFirstAvailableVariant']>['image'];
 
 type PredictiveSearchResultItemPrice =
-  | PredictiveProductFragment['variants']['nodes'][0]['price'];
+  | NonNullable<PredictiveProductFragment['selectedOrFirstAvailableVariant']>['price'];
 
 export type NormalizedPredictiveSearchResultItem = {
   __typename: string | undefined;
@@ -175,9 +175,9 @@ function SearchResultsProductsGrid({
                   prefetch="intent"
                   to={`/products/${product.handle}${trackingParams}`}
                 >
-                  {product.variants.nodes[0].image && (
+                  {product.selectedOrFirstAvailableVariant?.image && (
                     <Image
-                      data={product.variants.nodes[0].image}
+                      data={product.selectedOrFirstAvailableVariant.image}
                       alt={product.title}
                       width={50}
                     />
@@ -185,7 +185,9 @@ function SearchResultsProductsGrid({
                   <div>
                     <p>{product.title}</p>
                     <small>
-                      <Money data={product.variants.nodes[0].price} />
+                      {product.selectedOrFirstAvailableVariant?.price && (
+                        <Money data={product.selectedOrFirstAvailableVariant.price} />
+                      )}
                     </small>
                   </div>
                 </Link>

@@ -47,6 +47,8 @@
     "@parcel/watcher": "^2.4.1",
     "@remix-run/dev": "^2.16.1",
     "@remix-run/eslint-config": "^2.16.1",
+    "@remix-run/fs-routes": "^2.17.4",
+    "@remix-run/route-config": "^2.17.4",
     "@shopify/cli": "^3.79.2",
     "@shopify/hydrogen-codegen": "^0.3.3",
     "@shopify/mini-oxygen": "^3.2.1",

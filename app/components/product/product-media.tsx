@@ -1,6 +1,5 @@
 import {MediaFile} from '@shopify/hydrogen';
 import type {Media} from '@shopify/hydrogen/storefront-api-types';
-import type {ProductVariantFragment} from 'storefrontapi.generated';
 import {tw} from '~/utils/tw';
 import {
   Carousel,
@@ -17,12 +16,10 @@ export const PRODUCT_IMAGE_STYLES = tw('border border-gray-200 rounded-lg');
 
 export const ProductMedia = ({
   media,
-  variants,
   isMobile,
   selectedVariant,
 }: {
   media: any;
-  variants: ProductVariantFragment[];
   isMobile: boolean;
   selectedVariant: any;
 }) => {
@@ -30,20 +27,7 @@ export const ProductMedia = ({
     return null;
   }
 
-  let items = media.edges;
-  if (variants.length > 1) {
-    const variantsUrls = variants.map((variant) => variant.image?.url);
-    /**
-     * We filter out the images that are already present in the variants
-     * Currently the only way we can do this is by comparing the urls
-     */
-    items = items.filter((item: {node: Media}) => {
-      return (
-        item.node.mediaContentType === 'IMAGE' &&
-        !variantsUrls.includes(item?.node?.previewImage?.url)
-      );
-    });
-  }
+  const items = media.edges;
 
   // Return carousel for mobile
   if (isMobile) {
