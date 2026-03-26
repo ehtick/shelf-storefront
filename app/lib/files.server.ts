@@ -96,7 +96,13 @@ export async function parseFileFormData({
   try {
     const uploadHandler = unstable_composeUploadHandlers(
       async ({contentType, data, filename}) => {
-        if (!contentType?.includes('image') || !filename) {
+        const allowedContentTypes = [
+          'image/png',
+          'image/svg+xml',
+          'application/pdf',
+        ];
+
+        if (!contentType || !allowedContentTypes.includes(contentType) || !filename) {
           return undefined;
         }
 
