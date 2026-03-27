@@ -25,7 +25,7 @@
     "@react-router/fs-routes": "^7.9.2",
     "@remix-run/react": "^2.16.1",
     "@remix-run/server-runtime": "^2.16.1",
-    "@shopify/hydrogen": "^2025.10.0",
+    "@shopify/hydrogen": "^2026.1.0",
     "@shopify/remix-oxygen": "^2.0.12",
     "@supabase/supabase-js": "^2.49.4",
     "crisp-sdk-web": "^1.0.25",
