@@ -1,4 +1,4 @@
-import {useEffect} from 'react';
+import {useEffect, useRef} from 'react';
 import {type LoaderFunctionArgs} from 'react-router';
 import {useLoaderData, type MetaFunction} from 'react-router';
 import type {ProductFragment} from 'storefrontapi.generated';
@@ -24,6 +24,7 @@ import {
 } from '~/components/product/product-media';
 import {tw} from '~/utils/tw';
 import {useWindowSize} from '~/utils/use-window-size';
+import {useStickyColumn} from '~/utils/use-sticky-sidebar';
 
 export const meta: MetaFunction<typeof loader> = ({data}) => {
   return [{title: appendToMetaTitle(data?.product.title ?? '')}];
@@ -124,6 +125,8 @@ export default function Product() {
   const metafields = extractProductMetafields(product);
   const {width} = useWindowSize();
   const isMobile = width ? width < 768 : false;
+  const productMainRef = useRef<HTMLDivElement>(null);
+  useStickyColumn(productMainRef);
 
   const {title, descriptionHtml} = product;
   return (
@@ -146,7 +149,7 @@ export default function Product() {
           </div>
         )}
 
-        <div className="product-main pt-4 md:pt-7">
+        <div ref={productMainRef} className="product-main pt-4 md:pt-7">
           <Breadcrumbs />
           <img
             src="/images/logo-full-color.png"

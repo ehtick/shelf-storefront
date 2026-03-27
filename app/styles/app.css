@@ -665,11 +665,14 @@ button.reset:hover:not(:has(> *)) {
   width: 100%;
 }
 
-.product-main,
 .product-media-desktop {
+  @apply relative max-w-full;
   align-self: start;
+}
 
-  @apply relative md:sticky md:top-[6rem] max-w-full;
+.product-main {
+  @apply relative max-w-full;
+  align-self: start;
 }
 
 .product-media-desktop {
