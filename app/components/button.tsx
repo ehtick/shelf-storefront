@@ -1,6 +1,6 @@
 import React from 'react';
 import {ExternalLinkIcon} from '@radix-ui/react-icons';
-import {Link} from '@remix-run/react';
+import {Link} from 'react-router';
 // import type {IconType} from './icons-map';
 // import Icon from '../icons/icon';
 import {tw} from '~/utils/tw';

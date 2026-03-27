@@ -1,5 +1,5 @@
 import {Suspense} from 'react';
-import {Await, NavLink, useRouteLoaderData} from '@remix-run/react';
+import {Await, NavLink, useRouteLoaderData} from 'react-router';
 import {type CartViewPayload, RichText, useAnalytics} from '@shopify/hydrogen';
 import type {HeaderQuery, CartApiQueryFragment} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';

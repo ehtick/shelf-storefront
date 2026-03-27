@@ -1,8 +1,13 @@
 import {CloudUpload, CheckCircle, Trash2} from 'lucide-react';
 import React, {useState, useCallback, useEffect, useMemo} from 'react';
 
-import {useFetcher} from '@remix-run/react';
-import type {FileUploadAction} from '~/routes/($locale).api.file-upload';
+import {useFetcher} from 'react-router';
+
+type FileUploadResponse = {
+  success?: boolean;
+  fileName?: string;
+  error?: string;
+};
 import {LogoUploadGuide} from './logo-upload-guide';
 import {Spinner} from '../generic/spinner';
 
@@ -26,7 +31,7 @@ const FileUploadDropzone = ({
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [uploadSuccess, setUploadSuccess] = useState<boolean>(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
-  const fetcher = useFetcher<FileUploadAction>();
+  const fetcher = useFetcher<FileUploadResponse>();
 
   const MAX_FILE_SIZE = 8 * 1024 * 1024; // 8MB
   const ALLOWED_FILE_TYPES = useMemo(
@@ -361,7 +366,7 @@ function DeleteFileButton({
   isUploading: boolean;
   uploadedFileUrl: string;
 }) {
-  const fetcher = useFetcher<FileUploadAction>();
+  const fetcher = useFetcher<FileUploadResponse>();
   useEffect(() => {
     if (
       fetcher.state === 'submitting' &&

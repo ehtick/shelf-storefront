@@ -1,4 +1,4 @@
-import {json, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
+import {type LoaderFunctionArgs} from 'react-router';
 import type {
   NormalizedPredictiveSearch,
   NormalizedPredictiveSearchResults,
@@ -43,7 +43,7 @@ export async function loader({request, params, context}: LoaderFunctionArgs) {
     context,
   });
 
-  return json(search, {
+  return Response.json(search, {
     headers: {'Cache-Control': `max-age=${search.searchTerm ? 60 : 3600}`},
   });
 }
@@ -148,10 +148,10 @@ export function normalizePredictiveSearchResults(
             __typename: product.__typename,
             handle: product.handle,
             id: product.id,
-            image: product.variants?.nodes?.[0]?.image,
+            image: product.selectedOrFirstAvailableVariant?.image,
             title: product.title,
             url: `${localePrefix}/products/${product.handle}${trackingParams}`,
-            price: product.variants.nodes[0].price,
+            price: product.selectedOrFirstAvailableVariant?.price,
           };
         },
       ),
@@ -262,19 +262,21 @@ const PREDICTIVE_SEARCH_QUERY = `#graphql
     title
     handle
     trackingParameters
-    variants(first: 1) {
-      nodes {
-        id
-        image {
-          url
-          altText
-          width
-          height
-        }
-        price {
-          amount
-          currencyCode
-        }
+    selectedOrFirstAvailableVariant(
+      selectedOptions: []
+      ignoreUnknownOptions: true
+      caseInsensitiveMatch: true
+    ) {
+      id
+      image {
+        url
+        altText
+        width
+        height
+      }
+      price {
+        amount
+        currencyCode
       }
     }
   }

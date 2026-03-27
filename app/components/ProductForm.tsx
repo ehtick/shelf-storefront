@@ -1,9 +1,6 @@
-import {Link} from '@remix-run/react';
-import {type VariantOption, VariantSelector} from '@shopify/hydrogen';
-import type {
-  ProductFragment,
-  ProductVariantFragment,
-} from 'storefrontapi.generated';
+import {useNavigate} from 'react-router';
+import {type MappedProductOptions} from '@shopify/hydrogen';
+import type {ProductFragment} from 'storefrontapi.generated';
 import {twMerge} from 'tailwind-merge';
 import {AddToCartButton} from '~/components/AddToCartButton';
 import {useAside} from '~/components/Aside';
@@ -16,13 +13,14 @@ import {assertIsCustomizedProduct} from '~/utils/products';
 
 export function ProductForm({
   product,
+  productOptions,
   selectedVariant,
-  variants,
 }: {
   product: ProductFragment;
-  selectedVariant: ProductFragment['selectedVariant'];
-  variants: Array<ProductVariantFragment>;
+  productOptions: MappedProductOptions[];
+  selectedVariant: ProductFragment['selectedOrFirstAvailableVariant'];
 }) {
+  const navigate = useNavigate();
   const {open} = useAside();
   const [quantity, setQuantity] = useState(1);
   const isCustomizedProduct = assertIsCustomizedProduct(product);
@@ -33,16 +31,70 @@ export function ProductForm({
 
   return (
     <div className="">
-      <VariantSelector
-        handle={product.handle}
-        options={product.options.filter((option) => option.values.length > 1)}
-        variants={variants}
-      >
-        {({option}) => {
-          return <ProductOptions key={option.name} option={option} />;
-        }}
-      </VariantSelector>
-      <PricePerSheet product={product} />
+      {productOptions.map((option) => {
+        if (option.optionValues.length <= 1) return null;
+        return (
+          <div className="mt-6" key={option.name}>
+            <h5 className="text-gray-700 text-[14px] font-medium mb-[6px]">
+              {option.name}
+            </h5>
+            <div className="flex items-center justify-normal border border-gray-200 rounded-[4px] p-1 bg-gray-50 w-fit">
+              {option.optionValues.map((value) => {
+                const {
+                  name,
+                  variantUriQuery,
+                  selected,
+                  available,
+                  isDifferentProduct,
+                  handle,
+                } = value;
+
+                if (isDifferentProduct) {
+                  return (
+                    <a
+                      className={twMerge(
+                        'text-[14px] font-semibold py-2 px-3 rounded-[3px] hover:no-underline',
+                        selected
+                          ? 'bg-white text-gray-700 shadow-md'
+                          : 'bg-gray-10 text-gray-500',
+                        !available && 'opacity-50',
+                      )}
+                      key={option.name + name}
+                      href={`/products/${handle}?${variantUriQuery}`}
+                    >
+                      {name}
+                    </a>
+                  );
+                }
+
+                return (
+                  <button
+                    type="button"
+                    className={twMerge(
+                      'text-[14px] font-semibold py-2 px-3 rounded-[3px] hover:no-underline',
+                      selected
+                        ? 'bg-white text-gray-700 shadow-md'
+                        : 'bg-gray-10 text-gray-500',
+                      !available && 'opacity-50',
+                    )}
+                    key={option.name + name}
+                    onClick={() => {
+                      if (!selected) {
+                        navigate(`?${variantUriQuery}`, {replace: true});
+                      }
+                    }}
+                  >
+                    {name}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
+      {selectedVariant && (
+        <PricePerSheet product={product} selectedVariant={selectedVariant} />
+      )}
 
       <br />
       {/* Logo upload dropzone */}
@@ -105,37 +157,6 @@ export function ProductForm({
           to delivery.
         </div>
       )}
-    </div>
-  );
-}
-
-function ProductOptions({option}: {option: VariantOption}) {
-  return (
-    <div className="mt-6" key={option.name}>
-      <h5 className="text-gray-700 text-[14px] font-medium mb-[6px]">
-        {option.name}
-      </h5>
-      <div className="flex items-center justify-normal border border-gray-200 rounded-[4px] p-1 bg-gray-50 w-fit">
-        {option.values.map(({value, isAvailable, isActive, to}) => {
-          return (
-            <Link
-              className={twMerge(
-                'text-[14px] font-semibold py-2 px-3 rounded-[3px]  hover:no-underline',
-                isActive
-                  ? 'bg-white text-gray-700 shadow-md '
-                  : 'bg-gray-10 text-gray-500',
-              )}
-              key={option.name + value}
-              prefetch="intent"
-              preventScrollReset
-              replace
-              to={to}
-            >
-              {value}
-            </Link>
-          );
-        })}
-      </div>
     </div>
   );
 }

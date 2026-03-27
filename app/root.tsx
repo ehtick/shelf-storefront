@@ -1,5 +1,5 @@
 import {useNonce, getShopAnalytics, Analytics} from '@shopify/hydrogen';
-import {defer, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
+import type {LoaderFunctionArgs} from 'react-router';
 import {
   Links,
   Meta,
@@ -10,8 +10,7 @@ import {
   ScrollRestoration,
   isRouteErrorResponse,
   type ShouldRevalidateFunction,
-  LiveReload,
-} from '@remix-run/react';
+} from 'react-router';
 import favicon from '~/assets/favicon.ico';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
@@ -73,7 +72,7 @@ export async function loader(args: LoaderFunctionArgs) {
 
   const {storefront, env} = args.context;
 
-  return defer({
+  return {
     ...deferredData,
     ...criticalData,
     publicStoreDomain: env.PUBLIC_STORE_DOMAIN,
@@ -88,7 +87,7 @@ export async function loader(args: LoaderFunctionArgs) {
     MAILERLITE_ACCOUNT: env.MAILERLITE_ACCOUNT,
     STORE_URL: env.STORE_URL,
     CRISP_WEBSITE_ID: env.CRISP_WEBSITE_ID,
-  });
+  };
 }
 
 /**

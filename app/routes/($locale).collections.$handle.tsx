@@ -1,5 +1,5 @@
-import {defer, redirect, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
-import {useLoaderData, Link, type MetaFunction} from '@remix-run/react';
+import {redirect, type LoaderFunctionArgs} from 'react-router';
+import {useLoaderData, Link, type MetaFunction} from 'react-router';
 import {
   Pagination,
   getPaginationVariables,
@@ -24,7 +24,7 @@ export async function loader(args: LoaderFunctionArgs) {
   // Await the critical data required to render initial state of the page
   const criticalData = await loadCriticalData(args);
 
-  return defer({...deferredData, ...criticalData});
+  return {...deferredData, ...criticalData};
 }
 
 /**

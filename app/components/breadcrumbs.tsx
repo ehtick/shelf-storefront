@@ -1,5 +1,5 @@
 import {ChevronRightIcon} from '@radix-ui/react-icons';
-import {Link, useMatches} from '@remix-run/react';
+import {Link, useMatches} from 'react-router';
 import {tw} from '~/utils/tw';
 import type {Collection, Product} from '@shopify/hydrogen/storefront-api-types';
 import {ChevronLeft} from 'lucide-react';
