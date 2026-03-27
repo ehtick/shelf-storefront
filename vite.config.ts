@@ -6,17 +6,9 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
   server: {
-    allowedHosts: [
-      'localhost',
-      'priorities-runner-jail-requests.trycloudflare.com',
-    ],
+    allowedHosts: ['localhost', 'walks-graham-terminal-trek.tryhydrogen.dev'],
   },
-  plugins: [
-    hydrogen(),
-    oxygen(),
-    reactRouter(),
-    tsconfigPaths(),
-  ],
+  plugins: [hydrogen(), oxygen(), reactRouter(), tsconfigPaths()],
   build: {
     // Allow a strict Content-Security-Policy
     // withtout inlining assets as base64:
